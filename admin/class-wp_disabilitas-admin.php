@@ -127,16 +127,24 @@ class Wp_disabilitas_Admin {
 			'post_status' => 'publish'
 		));
 
+		$sql_migrate = $this->functions->generatePage(array(
+			'nama_page' => 'Monitoring SQL migrate WP Disabilitas', 
+			'content' => '[monitoring_sql_migrate_disabilitas]',
+        	'show_header' => 1,
+        	'no_key' => 1
+		));
+
 		$basic_options_container = Container::make( 'theme_options', __( 'Disabilitas Options' ) )
 			->set_page_menu_position( 4 )
 	        ->add_fields( array(
 				Field::make( 'html', 'crb_disabilitas_halaman_terkait' )
 		        	->set_html( '
 					<h5>HALAMAN TERKAIT</h5>
-	            	<ul>
+	            	<ol>
 	            		<li><a target="_blank" href="'.$data_disabilitas['url'].'">'.$data_disabilitas['title'].'</a></li>
 	            		<li><a target="_blank" href="'.$statistik_disabilitas['url'].'">'.$statistik_disabilitas['title'].'</a></li>
-	            	</ul>
+	            		<li><a target="_blank" href="'.$sql_migrate['url'].'">SQL Migrate'.$sql_migrate['title'].'</a></li>
+	            	</ol>
 		        	' ),
 	            Field::make( 'text', 'crb_apikey_disabilitas', 'API KEY' )
 	            	->set_default_value($this->functions->generateRandomString())
@@ -176,8 +184,107 @@ class Wp_disabilitas_Admin {
 			'message'	=> 'Berhasil import excel!'
 		);
 		if (!empty($_POST)) {
-			$ret['data'] = array();
+			$ret['data'] = array(
+				'insert' => 0, 
+				'update' => 0,
+				'error' => array()
+			);
 			foreach ($_POST['data'] as $k => $data) {
+				$newData = array();
+				foreach($data as $kk => $vv){
+					$newData[trim($kk)] = $vv;
+				}
+				$data_db = array(
+					'nama' => $newData['nama'],
+					'gender' => $newData['gender'],
+					'tempat_lahir' => $newData['tempat_lahir'],
+					'tanggal_lahir' => $newData['tanggal_lahir'],
+					'status' => $newData['status'],
+					'dokumen_kewarganegaraan' => $newData['dokumen_kewarganegaraan'],
+					'nik' => $newData['nik'],
+					'nomor_kk' => $newData['nomor_kk'],
+					'rt_rw' => $newData['rt_rw'],
+					'desa' => $newData['desa'],
+					'no_hp' => $newData['no_hp'],
+					'pendidikan_terakhir' => $newData['pendidikan_terakhir'],
+					'nama_sekolah' => $newData['nama_sekolah'],
+					'keterangan_lulus' => $newData['keterangan_lulus'],
+					'jenis_disabilitas' => $newData['jenis_disabilitas'],
+					'keterangan_disabilitas' => $newData['keterangan_disabilitas'],
+					'sebab_disabilitas' => $newData['sebab_disabilitas'],
+					'diagnosa_medis' => $newData['diagnosa_medis'],
+					'penyakit_lain' => $newData['penyakit_lain'],
+					'tempat_pengobatan' => $newData['tempat_pengobatan'],
+					'perawat' => $newData['perawat'],
+					'aktivitas' => $newData['aktivitas'],
+					'aktivitas_bantuan' => $newData['aktivitas_bantuan'],
+					'perlu_bantu' => $newData['perlu_bantu'],
+					'alat_bantu' => $newData['alat_bantu'],
+					'alat_yang_dimiliki' => $newData['alat_yang_dimiliki'],
+					'kondisi_alat' => $newData['kondisi_alat'],
+					'jaminan_kesehatan' => $newData['jaminan_kesehatan'],
+					'cara_menggunakan_jamkes' => $newData['cara_menggunakan_jamkes'],
+					'jaminan_sosial' => $newData['jaminan_sosial'],
+					'pekerjaan' => $newData['pekerjaan'],
+					'lokasi_bekerja' => $newData['lokasi_bekerja'],
+					'alasan_tidak_bekerja' => $newData['alasan_tidak_bekerja'],
+					'pendapatan_bulan' => $newData['pendapatan_bulan'],
+					'pengeluaran_bulan' => $newData['pengeluaran_bulan'],
+					'pendapatan_lain' => $newData['pendapatan_lain'],
+					'minat_kerja' => $newData['minat_kerja'],
+					'keterampilan' => $newData['keterampilan'],
+					'pelatihan_yang_diikuti' => $newData['pelatihan_yang_diikuti'],
+					'pelatihan_yang_diminat' => $newData['pelatihan_yang_diminat'],
+					'status_rumah' => $newData['status_rumah'],
+					'lantai' => $newData['lantai'],
+					'kamar_mandi' => $newData['kamar_mandi'],
+					'wc' => $newData['wc'],
+					'akses_ke_lingkungan' => $newData['akses_ke_lingkungan'],
+					'dinding' => $newData['dinding'],
+					'sarana_air' => $newData['sarana_air'],
+					'penerangan' => $newData['penerangan'],
+					'desa_paud' => $newData['desa_paud'],
+					'tk_di_desa' => $newData['tk_di_desa'],
+					'kecamatan_slb' => $newData['kecamatan_slb'],
+					'sd_menerima_abk' => $newData['sd_menerima_abk'],
+					'smp_menerima_abk' => $newData['smp_menerima_abk'],
+					'jumlah_posyandu' => $newData['jumlah_posyandu'],
+					'kader_posyandu' => $newData['kader_posyandu'],
+					'layanan_kesehatan' => $newData['layanan_kesehatan'],
+					'sosialitas_ke_tetangga' => $newData['sosialitas_ke_tetangga'],
+					'keterlibatan_berorganisasi' => $newData['keterlibatan_berorganisasi'],
+					'kegiatan_kemasyarakatan' => $newData['kegiatan_kemasyarakatan'],
+					'keterlibatan_musrembang' => $newData['keterlibatan_musrembang'],
+					'alat_bantu_bantuan' => $newData['alat_bantu_bantuan'],
+					'asal_alat_bantu' => $newData['asal_alat_bantu'],
+					'tahun_pemberian' => $newData['tahun_pemberian'],
+					'bantuan_uep' => $newData['bantuan_uep'],
+					'asal_uep' => $newData['asal_uep'],
+					'tahun' => $newData['tahun'],
+					'lainnya' => $newData['lainnya'],
+					'rehabilitas' => $newData['rehabilitas'],
+					'lokasi_rehabilitas' => $newData['lokasi_rehabilitas'],
+					'tahun_rehabilitas' => $newData['tahun_rehabilitas'],
+					'keahlian_khusus' => $newData['keahlian_khusus'],
+					'prestasi' => $newData['prestasi'],
+					'nama_perawat' => $newData['nama_perawat'],
+					'hubungan_dengan_pd' => $newData['hubungan_dengan_pd'],
+					'nomor_hp' => $newData['nomor_hp']
+				);
+				$wpdb->last_error = "";
+				$cek_id = $wpdb->get_var($wpdb->prepare("SELECT id from data_disabilitas where nama=%s and nik=%s", $newData['nama'], $newData['nik']));
+				if(empty($cek_id)){
+					$wpdb->insert("data_disabilitas", $data_db);
+					$ret['data']['insert']++;
+				}else{
+					$wpdb->update("data_disabilitas", $data_db, array(
+						"id" => $cek_id
+					));
+					$ret['data']['update']++;
+				}
+				if(!empty($wpdb->last_error)){
+					$ret['data']['error'][] = array($wpdb->last_error, $data_db);
+				};
 
 			}
 		} else {
@@ -185,6 +292,23 @@ class Wp_disabilitas_Admin {
 			$ret['message'] = 'Format Salah!';
 		}
 		die(json_encode($ret));
+	}
+
+	function wp_disabilitas_admin_notice(){
+        $versi = get_option('_wp_disabilitas_db_version');
+        if($versi !== $this->version){
+			$sql_migrate = $this->functions->generatePage(array(
+				'nama_page' => 'Monitoring SQL migrate WP Disabilitas', 
+				'content' => '[monitoring_sql_migrate_disabilitas]',
+	        	'show_header' => 1,
+	        	'no_key' => 1
+			));
+        	echo '
+        		<div class="notice notice-warning is-dismissible">
+	        		<p>Versi database WP Disabilitas tidak sesuai! harap dimutakhirkan. Versi saat ini=<b>'.$this->version.'</b> dan versi WP Disabilitas kamu=<b>'.$versi.'</b>. Silahkan update di halaman <a href="'.$sql_migrate['url'].'" class="button button-primary button-large">'.$sql_migrate['title'].'</a></p>
+	         	</div>
+	         ';
+        }
 	}
 
 }

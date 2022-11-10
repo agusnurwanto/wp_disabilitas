@@ -103,4 +103,74 @@ class Wp_disabilitas_Public {
 
 	}
 
+	function monitoring_sql_migrate_disabilitas(){
+		// untuk disable render shortcode di halaman edit page/post
+		if(!empty($_GET) && !empty($_GET['post'])){
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-public-monitor-sql-migrate.php';
+	}
+
+	public function run_sql_migrate_disabilitas(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil menjalankan SQL migrate!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( WP_DISABILITAS_KEY )) {
+				$file = basename($_POST['file']);
+				$ret['value'] = $file.' (tgl: '.date('Y-m-d H:i:s').')';
+				if($file == 'tabel.sql'){
+					$path = WP_DISABILITAS_PLUGIN_PATH.'/'.$file;
+				}else{
+					$path = WP_DISABILITAS_PLUGIN_PATH.'/sql-migrate/'.$file;
+				}
+				if(file_exists($path)){
+					$sql = file_get_contents($path);
+					$ret['sql'] = $sql;
+					if($file == 'tabel.sql'){
+						require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+						$wpdb->hide_errors();
+						$rows_affected = dbDelta($sql);
+						if(empty($rows_affected)){
+							$ret['status'] = 'error';
+							$ret['message'] = $wpdb->last_error;
+						}else{
+							$ret['message'] = implode(' | ', $rows_affected);
+						}
+					}else{
+						$wpdb->hide_errors();
+						$res = $wpdb->query($sql);
+						if(empty($res)){
+							$ret['status'] = 'error';
+							$ret['message'] = $wpdb->last_error;
+						}else{
+							$ret['message'] = $res;
+						}
+					}
+					if($ret['status'] == 'success'){
+						$ret['version'] = $this->version;
+						update_option('_last_update_sql_migrate_disabilitas', $ret['value']);
+						update_option('_wp_disabilitas_db_version', $this->version);
+					}
+				}else{
+					$ret['status'] = 'error';
+					$ret['message'] = 'File '.$file.' tidak ditemukan!';
+				}
+			}else{
+				$ret = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		}else{
+			$ret = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
 }

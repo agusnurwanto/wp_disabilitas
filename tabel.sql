@@ -1,34 +1,9 @@
--- phpMyAdmin SQL Dump
--- version 5.2.0
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Nov 10, 2022 at 09:40 AM
--- Server version: 10.4.25-MariaDB
--- PHP Version: 8.1.10
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `wordpress`
---
-
--- --------------------------------------------------------
-
 --
 -- Table structure for table `data_disabillitas`
 --
 
-CREATE TABLE `data_disabillitas` (
-  `id` int(11) NOT NULL,
+CREATE TABLE `data_disabilitas` (
+  `id` int(11) NOT NULL auto_increment,
   `nama` text NOT NULL,
   `gender` varchar(1) DEFAULT NULL,
   `tempat_lahir` text DEFAULT NULL,
@@ -37,7 +12,7 @@ CREATE TABLE `data_disabillitas` (
   `dokumen_kewarganegaraan` varchar(100) DEFAULT NULL,
   `nik` double(20,0) DEFAULT NULL,
   `nomor_kk` double(20,0) DEFAULT NULL,
-  `rt_rw` varchar(10) DEFAULT NULL,
+  `rt_rw` text DEFAULT NULL,
   `desa` text DEFAULT NULL,
   `no_hp` double(16,0) DEFAULT NULL,
   `pendidikan_terakhir` varchar(30) DEFAULT NULL,
@@ -103,30 +78,6 @@ CREATE TABLE `data_disabillitas` (
   `prestasi` text DEFAULT NULL,
   `nama_perawat` text DEFAULT NULL,
   `hubungan_dengan_pd` text DEFAULT NULL,
-  `nomor_hp` double DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `data_disabillitas`
---
-ALTER TABLE `data_disabillitas`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `data_disabillitas`
---
-ALTER TABLE `data_disabillitas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+  `nomor_hp` double DEFAULT NULL,
+  PRIMARY KEY  (id)
+);

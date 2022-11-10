@@ -163,10 +163,11 @@ class Wp_disabilitas {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action('admin_notices',  $plugin_admin, 'wp_disabilitas_admin_notice');
 
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_disabilitas_options');
 
-		$this->loader->add_action('wp_ajax_import_excel',  $plugin_admin, 'import_excel_disabilitas');
+		$this->loader->add_action('wp_ajax_import_excel_disabilitas',  $plugin_admin, 'import_excel_disabilitas');
 
 	}
 
@@ -183,6 +184,10 @@ class Wp_disabilitas {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		$this->loader->add_action('wp_ajax_run_sql_migrate_disabilitas',  $plugin_public, 'run_sql_migrate_disabilitas');
+
+		add_shortcode('monitoring_sql_migrate_disabilitas', array($plugin_public, 'monitoring_sql_migrate_disabilitas'));
 
 	}
 
