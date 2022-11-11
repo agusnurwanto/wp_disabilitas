@@ -272,7 +272,11 @@ class Wp_disabilitas_Admin {
 					'nomor_hp' => $newData['nomor_hp']
 				);
 				$wpdb->last_error = "";
-				$cek_id = $wpdb->get_var($wpdb->prepare("SELECT id from data_disabilitas where nama=%s and nik=%s", $newData['nama'], $newData['nik']));
+				if(empty($newData['nik'])){
+					$cek_id = $wpdb->get_var($wpdb->prepare("SELECT id from data_disabilitas where nama=%s and nik is null", $newData['nama']));
+				}else{
+					$cek_id = $wpdb->get_var($wpdb->prepare("SELECT id from data_disabilitas where nama=%s and nik=%s", $newData['nama'], $newData['nik']));
+				}
 				if(empty($cek_id)){
 					$wpdb->insert("data_disabilitas", $data_db);
 					$ret['data']['insert']++;
