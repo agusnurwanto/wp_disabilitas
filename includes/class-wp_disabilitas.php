@@ -188,6 +188,7 @@ class Wp_disabilitas {
 		$this->loader->add_action('wp_ajax_run_sql_migrate_disabilitas',  $plugin_public, 'run_sql_migrate_disabilitas');
 
 		add_shortcode('monitoring_sql_migrate_disabilitas', array($plugin_public, 'monitoring_sql_migrate_disabilitas'));
+		add_shortcode('statistik_disabilitas', array($plugin_public, 'statistik_disabilitas'));
 
 	}
 

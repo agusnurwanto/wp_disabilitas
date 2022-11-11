@@ -111,6 +111,14 @@ class Wp_disabilitas_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-public-monitor-sql-migrate.php';
 	}
 
+	function statistik_disabilitas(){
+		// untuk disable render shortcode di halaman edit page/post
+		if(!empty($_GET) && !empty($_GET['post'])){
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-public-statistik.php';
+	}
+
 	public function run_sql_migrate_disabilitas(){
 		global $wpdb;
 		$ret = array(
