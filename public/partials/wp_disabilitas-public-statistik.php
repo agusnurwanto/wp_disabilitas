@@ -16,6 +16,7 @@ $data = $wpdb->get_results("select * from data_disabilitas", ARRAY_A);
 $total_data = count($data);
 $gender = array();
 $usia = array();
+$jenis_disabilitas = array();
 foreach($data as $k => $v){
     if(empty($gender[$v['gender']])){
         $gender[$v['gender']] = array();
@@ -27,6 +28,12 @@ foreach($data as $k => $v){
         $usia[$current_usia] = array();
     }
     $usia[$current_usia][] = $v;
+
+    if(empty($jenis_disabilitas[$v["jenis_disabilitas"]])){
+        $jenis_disabilitas[$v["jenis_disabilitas"]] = array();
+    }
+    $jenis_disabilitas[$v["jenis_disabilitas"]][] = $v;
+
 }
 ksort($usia);
 // print_r($gender); die();
@@ -83,6 +90,29 @@ foreach($usia as $k => $v){
     $chart_usia['data'][] = $jumlah;
     $chart_usia['color'][] = "";
     $body_usia .= "
+        <tr>
+            <td>$jenis</td>
+            <td class='text-right'>$jumlah</td>
+        </tr>
+    ";
+}
+
+// grafik jenis
+$chart_jenis = array(
+    'label' => array(),
+    'data'  => array(),
+    'color' => array()
+);
+$total_jenis = 0;
+$body_jenis = "";
+foreach($jenis_disabilitas as $k => $v){
+    $jumlah = count($v);
+    $total_jenis += $jumlah;
+    $jenis = $k;
+    $chart_jenis['label'][] = $jenis;
+    $chart_jenis['data'][] = $jumlah;
+    $chart_jenis['color'][] = "";
+    $body_jenis .= "
         <tr>
             <td>$jenis</td>
             <td class='text-right'>$jumlah</td>
@@ -156,6 +186,36 @@ foreach($usia as $k => $v){
                 </table>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="text-center">Grafik Disabilitas berdasarkan Jenis Disabilitas</h2>
+                <div class="container counting-inner">
+                    <div class="row counting-box title-row" style="margin-bottom: 55px;">
+                        <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
+                            data-animation-delay="200">
+                            <div style="width: 300px; margin:auto;">
+                                <canvas id="chart_per_jenis"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Jenis Disabilitas</th>
+                            <th class="text-center">Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php echo $body_jenis; ?>
+                    </tbody>
+                    <tfoot>
+                        <th class="text-center">Total</th>
+                        <th class="text-right"><?php echo $total_jenis; ?></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript" src="<?php echo WP_DISABILITAS_PLUGIN_URL; ?>/public/js/chart.min.js"></script>
@@ -164,12 +224,12 @@ window.chart_gender = <?php echo json_encode($chart_gender); ?>;
 window.pieChart = new Chart(document.getElementById('chart_per_gender'), {
     type: 'pie',
     data: {
-        labels: chart_gender.label,
+        labels: chart_jenis_disabilitas.label,
         datasets: [
             {
                 label: '',
-                data: chart_gender.data,
-                backgroundColor: chart_gender.color
+                data: chart_jenis_disabilitas.data,
+                backgroundColor: chart_jenis_disabilitas.color
             }
         ]
     },
