@@ -14,6 +14,9 @@
         '
     );
     foreach($files as $k => $v){
+        if($v == 'index.html'){
+            continue;
+        }
         $tgl = str_replace('migrate-', '', $v);
         $tgl = str_replace('.sql', '', $tgl);
         $time = strtotime($tgl);

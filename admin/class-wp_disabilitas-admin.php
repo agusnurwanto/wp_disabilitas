@@ -143,7 +143,7 @@ class Wp_disabilitas_Admin {
 	            	<ol>
 	            		<li><a target="_blank" href="'.$data_disabilitas['url'].'">'.$data_disabilitas['title'].'</a></li>
 	            		<li><a target="_blank" href="'.$statistik_disabilitas['url'].'">'.$statistik_disabilitas['title'].'</a></li>
-	            		<li><a target="_blank" href="'.$sql_migrate['url'].'">SQL Migrate'.$sql_migrate['title'].'</a></li>
+	            		<li><a target="_blank" href="'.$sql_migrate['url'].'">'.$sql_migrate['title'].'</a></li>
 	            	</ol>
 		        	' ),
 	            Field::make( 'text', 'crb_apikey_disabilitas', 'API KEY' )
