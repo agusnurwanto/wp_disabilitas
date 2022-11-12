@@ -186,10 +186,12 @@ class Wp_disabilitas {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 		$this->loader->add_action('wp_ajax_run_sql_migrate_disabilitas',  $plugin_public, 'run_sql_migrate_disabilitas');
+		$this->loader->add_action('wp_ajax_get_data_disabilitas',  $plugin_public, 'get_data_disabilitas');
+		$this->loader->add_action('wp_ajax_nopriv_get_data_disabilitas',  $plugin_public, 'get_data_disabilitas');
 
 		add_shortcode('monitoring_sql_migrate_disabilitas', array($plugin_public, 'monitoring_sql_migrate_disabilitas'));
 		add_shortcode('statistik_disabilitas', array($plugin_public, 'statistik_disabilitas'));
-
+		add_shortcode('data_disabilitas', array($plugin_public, 'data_disabilitas'));
 	}
 
 	/**

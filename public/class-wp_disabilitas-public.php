@@ -119,6 +119,14 @@ class Wp_disabilitas_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-public-statistik.php';
 	}
 
+	function data_disabilitas(){
+		// untuk disable render shortcode di halaman edit page/post
+		if(!empty($_GET) && !empty($_GET['post'])){
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-data-disabilitas.php';
+	}
+
 	public function run_sql_migrate_disabilitas(){
 		global $wpdb;
 		$ret = array(
@@ -171,6 +179,54 @@ class Wp_disabilitas_Public {
 					'status' => 'error',
 					'message'	=> 'Api Key tidak sesuai!'
 				);
+			}
+		}else{
+			$ret = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	public function get_data_disabilitas(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil get data!'
+		);
+		if (!empty($_POST)) {
+			if(isset($_POST['g-recaptcha-response'])){
+	          	$captcha=$_POST['g-recaptcha-response'];
+	        }
+	        if(!$captcha){
+	        	$ret['status'] = 'error';
+	        }
+	        $secretKey = get_option('_crb_disabilitas_captcha_private');
+	        $ip = $_SERVER['REMOTE_ADDR'];
+	        // post request to server
+	        $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($secretKey) .  '&response=' . urlencode($captcha);
+	        $response = file_get_contents($url);
+	        $responseKeys = json_decode($response,true);
+	        if(empty($responseKeys["success"])) {
+	        	$ret['status'] = 'error';
+	        	$ret['message'] = 'Harap selesaikan validasi captcha dulu!';
+	        }else {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( WP_DISABILITAS_KEY )) {
+					$data = $wpdb->get_results($wpdb->prepare("
+						SELECT
+							*
+						FROM data_disabilitas
+						WHERE nik like %s
+							OR nama like %s
+					", '%'.$_POST['nik'].'%', '%'.$_POST['nik'].'%'));
+					$ret['data'] = $data;
+				}else{
+					$ret = array(
+						'status' => 'error',
+						'message'	=> 'Api Key tidak sesuai!'
+					);
+				}
 			}
 		}else{
 			$ret = array(
