@@ -1,5 +1,9 @@
 <?php
 global $wpdb;
+function generateRandomColor($k){
+    $color = array('#f44336', '#9c27b0', '#2196f3', '#009688', '#4caf50', '#cddc39', '#ff9800', '#795548', '#9e9e9e', '#607d8b');
+    return $color[$k%10];
+}
 function hitung_umur($tanggal_lahir){
     if(empty($tanggal_lahir)){
         return "Tidak diketahui";
@@ -36,6 +40,7 @@ foreach($data as $k => $v){
 
 }
 ksort($usia);
+ksort($jenis_disabilitas);
 // print_r($gender); die();
 
 // grafik gender
@@ -78,17 +83,34 @@ $chart_usia = array(
 );
 $total_usia = 0;
 $body_usia = "";
+$usia_baru = array();
 foreach($usia as $k => $v){
-    $jumlah = count($v);
-    $total_usia += $jumlah;
     if($k == 'Tidak diketahui'){
         $jenis = $k;
+    }else if($k <= 5){
+        $jenis = '0 - 5 tahun';
+    }else if($k <= 17){
+        $jenis = '6 - 17 tahun';
+    }else if($k <= 50){
+        $jenis = '18 - 50 tahun';
     }else{
-        $jenis = $k.' tahun';
+        $jenis = '51 tahun - lansia';
     }
+    if(empty($usia_baru[$jenis])){
+        $usia_baru[$jenis] = $v;
+    }else{
+        $usia_baru[$jenis] = array_merge($usia_baru[$jenis], $v);
+    }
+}
+$no = 0;
+foreach($usia_baru as $k => $v){
+    $no++;
+    $jumlah = count($v);
+    $total_usia += $jumlah;
+    $jenis = $k;
     $chart_usia['label'][] = $jenis;
     $chart_usia['data'][] = $jumlah;
-    $chart_usia['color'][] = "";
+    $chart_usia['color'][] = generateRandomColor($no);
     $body_usia .= "
         <tr>
             <td>$jenis</td>
@@ -105,13 +127,18 @@ $chart_jenis = array(
 );
 $total_jenis = 0;
 $body_jenis = "";
+$no = 0;
 foreach($jenis_disabilitas as $k => $v){
+    $no++;
     $jumlah = count($v);
     $total_jenis += $jumlah;
     $jenis = $k;
+    if(empty($jenis)){
+        $jenis = 'Tidak diketahui';
+    }
     $chart_jenis['label'][] = $jenis;
     $chart_jenis['data'][] = $jumlah;
-    $chart_jenis['color'][] = "";
+    $chart_jenis['color'][] = generateRandomColor($no);
     $body_jenis .= "
         <tr>
             <td>$jenis</td>
@@ -120,6 +147,11 @@ foreach($jenis_disabilitas as $k => $v){
     ";
 }
 ?>
+<style type="text/css">
+    .card {
+        margin-top: 20px;
+    }
+</style>
 <div class="cetak">
     <div style="padding: 10px;">
         <div class="row">
@@ -130,90 +162,108 @@ foreach($jenis_disabilitas as $k => $v){
         </div>
         <div class="row">
             <div class="col-md-6">
-                <h2 class="text-center">Grafik Disabilitas berdasarkan Gender</h2>
-                <div class="container counting-inner">
-                    <div class="row counting-box title-row" style="margin-bottom: 55px;">
-                        <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
-                            data-animation-delay="200">
-                            <div style="width: 300px; margin:auto;">
-                                <canvas id="chart_per_gender"></canvas>
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h2 class="text-center text-white">Grafik Disabilitas berdasarkan Gender</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="container counting-inner">
+                            <div class="row counting-box title-row" style="margin-bottom: 55px;">
+                                <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
+                                    data-animation-delay="200">
+                                    <div style="max-width: 500px; margin:auto;">
+                                        <canvas id="chart_per_gender"></canvas>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Gender</th>
+                                    <th class="text-center" style="width: 200px;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php echo $body_gender; ?>
+                            </tbody>
+                            <tfoot>
+                                <th class="text-center">Total</th>
+                                <th class="text-right"><?php echo $total_gender; ?></th>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Gender</th>
-                            <th class="text-center">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $body_gender; ?>
-                    </tbody>
-                    <tfoot>
-                        <th class="text-center">Total</th>
-                        <th class="text-right"><?php echo $total_gender; ?></th>
-                    </tfoot>
-                </table>
             </div>
             <div class="col-md-6">
-                <h2 class="text-center">Grafik Disabilitas berdasarkan Usia</h2>
-                <div class="container counting-inner">
-                    <div class="row counting-box title-row" style="margin-bottom: 55px;">
-                        <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
-                            data-animation-delay="200">
-                            <div style="width: 300px; margin:auto;">
-                                <canvas id="chart_per_usia"></canvas>
+                <div class="card">
+                    <div class="card-header bg-secondary">
+                        <h2 class="text-center text-white">Grafik Disabilitas berdasarkan Usia</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="container counting-inner">
+                            <div class="row counting-box title-row" style="margin-bottom: 55px;">
+                                <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
+                                    data-animation-delay="200">
+                                    <div style="max-width: 500px; margin:auto;">
+                                        <canvas id="chart_per_usia"></canvas>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Usia</th>
+                                    <th class="text-center" style="width: 200px;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php echo $body_usia; ?>
+                            </tbody>
+                            <tfoot>
+                                <th class="text-center">Total</th>
+                                <th class="text-right"><?php echo $total_usia; ?></th>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Usia</th>
-                            <th class="text-center">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $body_usia; ?>
-                    </tbody>
-                    <tfoot>
-                        <th class="text-center">Total</th>
-                        <th class="text-right"><?php echo $total_usia; ?></th>
-                    </tfoot>
-                </table>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <h2 class="text-center">Grafik Disabilitas berdasarkan Jenis Disabilitas</h2>
-                <div class="container counting-inner">
-                    <div class="row counting-box title-row" style="margin-bottom: 55px;">
-                        <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
-                            data-animation-delay="200">
-                            <div style="width: 300px; margin:auto;">
-                                <canvas id="chart_per_jenis"></canvas>
+                <div class="card">
+                    <div class="card-header bg-success">
+                        <h2 class="text-center text-white">Grafik Disabilitas berdasarkan Jenis Disabilitas</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="container counting-inner">
+                            <div class="row counting-box title-row" style="margin-bottom: 55px;">
+                                <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
+                                    data-animation-delay="200">
+                                    <div style="width: 100%; margin:auto;">
+                                        <canvas id="chart_per_jenis"></canvas>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Jenis Disabilitas</th>
+                                    <th class="text-center" style="width: 200px;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php echo $body_jenis; ?>
+                            </tbody>
+                            <tfoot>
+                                <th class="text-center">Total</th>
+                                <th class="text-right"><?php echo $total_jenis; ?></th>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Jenis Disabilitas</th>
-                            <th class="text-center">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php echo $body_jenis; ?>
-                    </tbody>
-                    <tfoot>
-                        <th class="text-center">Total</th>
-                        <th class="text-right"><?php echo $total_jenis; ?></th>
-                    </tfoot>
-                </table>
             </div>
         </div>
     </div>
@@ -224,12 +274,12 @@ window.chart_gender = <?php echo json_encode($chart_gender); ?>;
 window.pieChart = new Chart(document.getElementById('chart_per_gender'), {
     type: 'pie',
     data: {
-        labels: chart_jenis_disabilitas.label,
+        labels: chart_gender.label,
         datasets: [
             {
                 label: '',
-                data: chart_jenis_disabilitas.data,
-                backgroundColor: chart_jenis_disabilitas.color
+                data: chart_gender.data,
+                backgroundColor: chart_gender.color
             }
         ]
     },
@@ -241,6 +291,74 @@ window.pieChart = new Chart(document.getElementById('chart_per_gender'), {
                 labels: {
                     font: {
                         size: 16
+                    }
+                }
+            },
+            tooltip: {
+                bodyFont: {
+                    size: 16
+                },
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                boxPadding: 5
+            },
+        }
+    }
+});
+window.chart_usia = <?php echo json_encode($chart_usia); ?>;
+window.pieChart = new Chart(document.getElementById('chart_per_usia'), {
+    type: 'pie',
+    data: {
+        labels: chart_usia.label,
+        datasets: [
+            {
+                label: '',
+                data: chart_usia.data,
+                backgroundColor: chart_usia.color
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        size: 16
+                    }
+                }
+            },
+            tooltip: {
+                bodyFont: {
+                    size: 16
+                },
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                boxPadding: 5
+            },
+        }
+    }
+});
+window.chart_jenis = <?php echo json_encode($chart_jenis); ?>;
+window.pieChart = new Chart(document.getElementById('chart_per_jenis'), {
+    type: 'bar',
+    data: {
+        labels: chart_jenis.label,
+        datasets: [
+            {
+                label: '',
+                data: chart_jenis.data,
+                backgroundColor: chart_jenis.color
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        size: 0
                     }
                 }
             },
