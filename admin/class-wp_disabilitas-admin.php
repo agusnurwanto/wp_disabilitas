@@ -119,6 +119,13 @@ class Wp_disabilitas_Admin {
 			'post_status' => 'publish'
 		));
 
+		$data_disabilitas_admin = $this->functions->generatePage(array(
+			'nama_page' => 'Data Disabilitas Admin', 
+			'content' => '[data_disabilitas_admin]',
+        	'show_header' => 1,
+        	'no_key' => 1,
+		));
+
 		$statistik_disabilitas = $this->functions->generatePage(array(
 			'nama_page' => 'Statistik Disabilitas', 
 			'content' => '[statistik_disabilitas]',
@@ -141,6 +148,7 @@ class Wp_disabilitas_Admin {
 		        	->set_html( '
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
+	            		<li><a target="_blank" href="'.$data_disabilitas_admin['url'].'">'.$data_disabilitas_admin['title'].'</a></li>
 	            		<li><a target="_blank" href="'.$data_disabilitas['url'].'">'.$data_disabilitas['title'].'</a></li>
 	            		<li><a target="_blank" href="'.$statistik_disabilitas['url'].'">'.$statistik_disabilitas['title'].'</a></li>
 	            		<li><a target="_blank" href="'.$sql_migrate['url'].'">'.$sql_migrate['title'].'</a></li>

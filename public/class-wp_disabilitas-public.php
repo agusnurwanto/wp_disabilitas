@@ -127,6 +127,14 @@ class Wp_disabilitas_Public {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-data-disabilitas.php';
 	}
 
+	function data_disabilitas_admin(){
+		// untuk disable render shortcode di halaman edit page/post
+		if(!empty($_GET) && !empty($_GET['post'])){
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp_disabilitas-data-disabilitas-admin.php';
+	}
+
 	public function run_sql_migrate_disabilitas(){
 		global $wpdb;
 		$ret = array(
@@ -212,21 +220,162 @@ class Wp_disabilitas_Public {
 	        	$ret['status'] = 'error';
 	        	$ret['message'] = 'Harap selesaikan validasi captcha dulu!';
 	        }else {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( WP_DISABILITAS_KEY )) {
-					$data = $wpdb->get_results($wpdb->prepare("
-						SELECT
-							*
-						FROM data_disabilitas
-						WHERE nik like %s
-							OR nama like %s
-					", '%'.$_POST['nik'].'%', '%'.$_POST['nik'].'%'));
-					$ret['data'] = $data;
+	        	if(strlen($_POST['nik']) >=3){
+					if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( WP_DISABILITAS_KEY )) {
+						$data = $wpdb->get_results($wpdb->prepare("
+							SELECT
+								*
+							FROM data_disabilitas
+							WHERE nik like %s
+								OR nama like %s
+						", '%'.$_POST['nik'].'%', '%'.$_POST['nik'].'%'));
+						$ret['data'] = $data;
+					}else{
+						$ret = array(
+							'status' => 'error',
+							'message'	=> 'Api Key tidak sesuai!'
+						);
+					}
 				}else{
 					$ret = array(
 						'status' => 'error',
-						'message'	=> 'Api Key tidak sesuai!'
+						'message'	=> 'NIK/nama minimal 3 karakter!'
 					);
 				}
+			}
+		}else{
+			$ret = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
+
+	function get_data_disabilitas_all(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil get data all!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( WP_DISABILITAS_KEY )) {
+				$params = $columns = $totalRecords = $data = array();
+				$params = $_REQUEST;
+				$columns = array( 
+					'nama',
+					'gender',
+					'tempat_lahir',
+					'tanggal_lahir',
+					'status',
+					'dokumen_kewarganegaraan',
+					'nik',
+					'nomor_kk',
+					'rt_rw',
+					'desa',
+					'no_hp',
+					'pendidikan_terakhir',
+					'nama_sekolah',
+					'keterangan_lulus',
+					'jenis_disabilitas',
+					'keterangan_disabilitas',
+					'sebab_disabilitas',
+					'diagnosa_medis',
+					'penyakit_lain',
+					'tempat_pengobatan',
+					'perawat',
+					'aktivitas',
+					'aktivitas_bantuan',
+					'perlu_bantu',
+					'alat_bantu',
+					'alat_yang_dimiliki',
+					'kondisi_alat',
+					'jaminan_kesehatan',
+					'cara_menggunakan_jamkes',
+					'jaminan_sosial',
+					'pekerjaan',
+					'lokasi_bekerja',
+					'alasan_tidak_bekerja',
+					'pendapatan_bulan',
+					'pengeluaran_bulan',
+					'pendapatan_lain',
+					'minat_kerja',
+					'keterampilan',
+					'pelatihan_yang_diikuti',
+					'pelatihan_yang_diminat',
+					'status_rumah',
+					'lantai',
+					'kamar_mandi',
+					'wc',
+					'akses_ke_lingkungan',
+					'dinding',
+					'sarana_air',
+					'penerangan',
+					'desa_paud',
+					'tk_di_desa',
+					'kecamatan_slb',
+					'sd_menerima_abk',
+					'smp_menerima_abk',
+					'jumlah_posyandu',
+					'kader_posyandu',
+					'layanan_kesehatan',
+					'sosialitas_ke_tetangga',
+					'keterlibatan_berorganisasi',
+					'kegiatan_kemasyarakatan',
+					'keterlibatan_musrembang',
+					'alat_bantu_bantuan',
+					'asal_alat_bantu',
+					'tahun_pemberian',
+					'bantuan_uep',
+					'asal_uep',
+					'tahun',
+					'lainnya',
+					'rehabilitas',
+					'lokasi_rehabilitas',
+					'tahun_rehabilitas',
+					'keahlian_khusus',
+					'prestasi',
+					'nama_perawat',
+					'hubungan_dengan_pd',
+					'nomor_hp'
+				);
+				$where = $sqlTotAll = $sqlTot = $sqlRec = "";
+
+				// check search value exist
+				if( !empty($params['search']['value']) ) {
+					$where .=" AND ( nama LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");    
+					$where .=" OR nik LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+					$where .=" OR jenis_disabilitas LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%").")";
+				}
+
+				$sql_tot = "SELECT count(id) as jml FROM `data_disabilitas`";
+				$sql = "SELECT ".implode(', ', $columns)." FROM `data_disabilitas`";
+				$where_first = " WHERE 1=1";
+				$sqlTot .= $sql_tot.$where_first;
+				$sqlTotAll = $sql_tot;
+				$sqlRec .= $sql.$where_first;
+				if(isset($where) && $where != '') {
+					$sqlTot .= $where;
+					$sqlRec .= $where;
+				}
+				$sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", "", $wpdb->prepare('%s', $params['order'][0]['dir']))."  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length'])." ";
+
+				$totalRecords = $wpdb->get_var($sqlTotAll);
+				$recordsFiltered = $wpdb->get_var($sqlTot);
+				$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+
+				$json_data = array(
+					"draw"            => $params['draw']++,   
+					"recordsTotal"    => $totalRecords,  
+					"recordsFiltered" => $recordsFiltered,
+					"data"            => $queryRecords
+				);
+				$ret['data'] = $json_data;
+			}else{
+				$ret = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
 			}
 		}else{
 			$ret = array(

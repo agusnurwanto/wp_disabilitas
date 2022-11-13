@@ -58,6 +58,8 @@ function get_data(e){
     var nik = jQuery('#nik').val();
     if(nik == ''){
         return alert('NIK/nama harus diisi!');
+    }else if(nik.length < 3){
+        return alert('NIK/nama minimal 3 karakter!');
     }
     jQuery('#wrap-loading').show();
     jQuery('#pesan').html('');
