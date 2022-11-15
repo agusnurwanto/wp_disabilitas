@@ -45,7 +45,7 @@ class Wp_Disabilitas_Functions
     			return;
     		}
     		
-    		$key_db = md5(get_option( POSYANDU_KEY ));
+    		$key_db = md5(get_option( WP_DISABILITAS_KEY ));
     		$key = explode($key_db, $key);
     		$valid = 0;
     		if(
@@ -101,7 +101,7 @@ class Wp_Disabilitas_Functions
 	function gen_key($key_db = false, $options = array()){
 		$now = time()*1000;
 		if(empty($key_db)){
-			$key_db = md5(get_option( POSYANDU_KEY ));
+			$key_db = md5(get_option( WP_DISABILITAS_KEY ));
 		}
 		$tambahan_url = '';
 		if(!empty($options['custom_url'])){
@@ -117,7 +117,7 @@ class Wp_Disabilitas_Functions
 
 	public function decode_key($value){
 		$key = base64_decode($value);
-		$key_db = md5(get_option( POSYANDU_KEY ));
+		$key_db = md5(get_option( WP_DISABILITAS_KEY ));
 		$key = explode($key_db, $key);
 		$get = array();
 		if(!empty($key[2])){
