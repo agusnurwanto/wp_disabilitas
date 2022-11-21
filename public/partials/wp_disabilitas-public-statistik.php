@@ -21,6 +21,7 @@ $total_data = count($data);
 $gender = array();
 $usia = array();
 $jenis_disabilitas = array();
+$desa = array();
 foreach($data as $k => $v){
     if(empty($gender[$v['gender']])){
         $gender[$v['gender']] = array();
@@ -37,10 +38,17 @@ foreach($data as $k => $v){
         $jenis_disabilitas[$v["jenis_disabilitas"]] = array();
     }
     $jenis_disabilitas[$v["jenis_disabilitas"]][] = $v;
+    
+    if(empty($desa[$v["desa"]])){
+        $desa[$v["desa"]] = array();
+    }
+    $desa[$v["desa"]][] = $v;
+    
 
 }
 ksort($usia);
 ksort($jenis_disabilitas);
+ksort($desa);
 // print_r($gender); die();
 
 // grafik gender
@@ -142,6 +150,34 @@ foreach($jenis_disabilitas as $k => $v){
     $body_jenis .= "
         <tr>
             <td>$jenis</td>
+            <td class='text-right'>$jumlah</td>
+        </tr>
+    ";
+}
+
+// grafik desa
+$chart_desa = array(
+    'label' => array(),
+    'data'  => array(),
+    'color' => array()
+);
+$total_desa = 0;
+$body_desa = "";
+$no = 0;
+foreach($desa as $k => $v){
+    $no++;
+    $jumlah = count($v);
+    $total_desa += $jumlah;
+    $desa = $k;
+    if(empty($desa)){
+        $desa = 'Tidak diketahui';
+    }
+    $chart_desa['label'][] = $desa;
+    $chart_desa['data'][] = $jumlah;
+    $chart_desa['color'][] = generateRandomColor($no);
+    $body_desa .= "
+        <tr>
+            <td>$desa</td>
             <td class='text-right'>$jumlah</td>
         </tr>
     ";
@@ -266,12 +302,48 @@ foreach($jenis_disabilitas as $k => $v){
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h2 class="text-center text-white">Grafik Disabilitas berdasarkan Lokasi Desa</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="container counting-inner">
+                            <div class="row counting-box title-row" style="margin-bottom: 55px;">
+                                <div class="col-md-12 text-center animated" data-animation="fadeInBottom"
+                                    data-animation-delay="200">
+                                    <div style="width: 100%; margin:auto;">
+                                        <canvas id="chart_per_desa"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Desa</th>
+                                    <th class="text-center" style="width: 200px;">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php echo $body_desa; ?>
+                            </tbody>
+                            <tfoot>
+                                <th class="text-center">Total</th>
+                                <th class="text-right"><?php echo $total_desa; ?></th>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript" src="<?php echo WP_DISABILITAS_PLUGIN_URL; ?>/public/js/chart.min.js"></script>
 <script type="text/javascript">
 window.chart_gender = <?php echo json_encode($chart_gender); ?>;
-window.pieChart = new Chart(document.getElementById('chart_per_gender'), {
+window.pieChartGender = new Chart(document.getElementById('chart_per_gender'), {
     type: 'pie',
     data: {
         labels: chart_gender.label,
@@ -305,7 +377,7 @@ window.pieChart = new Chart(document.getElementById('chart_per_gender'), {
     }
 });
 window.chart_usia = <?php echo json_encode($chart_usia); ?>;
-window.pieChart = new Chart(document.getElementById('chart_per_usia'), {
+window.pieChartUsia = new Chart(document.getElementById('chart_per_usia'), {
     type: 'pie',
     data: {
         labels: chart_usia.label,
@@ -339,7 +411,7 @@ window.pieChart = new Chart(document.getElementById('chart_per_usia'), {
     }
 });
 window.chart_jenis = <?php echo json_encode($chart_jenis); ?>;
-window.pieChart = new Chart(document.getElementById('chart_per_jenis'), {
+window.pieChartJenis = new Chart(document.getElementById('chart_per_jenis'), {
     type: 'bar',
     data: {
         labels: chart_jenis.label,
@@ -348,6 +420,40 @@ window.pieChart = new Chart(document.getElementById('chart_per_jenis'), {
                 label: '',
                 data: chart_jenis.data,
                 backgroundColor: chart_jenis.color
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        size: 0
+                    }
+                }
+            },
+            tooltip: {
+                bodyFont: {
+                    size: 16
+                },
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                boxPadding: 5
+            },
+        }
+    }
+});
+window.desa = <?php echo json_encode($chart_desa); ?>;
+window.pieChartDesa = new Chart(document.getElementById('chart_per_desa'), {
+    type: 'bar',
+    data: {
+        labels: desa.label,
+        datasets: [
+            {
+                label: '',
+                data: desa.data,
+                backgroundColor: desa.color
             }
         ]
     },
