@@ -356,14 +356,25 @@ class Wp_disabilitas_Public {
 				$sql_tot = "SELECT count(id) as jml FROM `data_disabilitas`";
 				$sql = "SELECT ".implode(', ', $columns)." FROM `data_disabilitas`";
 				$where_first = " WHERE 1=1";
+
+				if(!empty($params['filter'])){
+					foreach($params['filter'] as $v){
+						$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).'='.$wpdb->prepare('%s', $v['val']);
+					}
+				}
+
 				$sqlTot .= $sql_tot.$where_first;
-				$sqlTotAll = $sql_tot;
+				$sqlTotAll = $sql_tot.$where_first;
+				// die($sqlTotAll);
 				$sqlRec .= $sql.$where_first;
 				if(isset($where) && $where != '') {
 					$sqlTot .= $where;
 					$sqlRec .= $where;
 				}
-				$sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", "", $wpdb->prepare('%s', $params['order'][0]['dir']))."  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length'])." ";
+				$sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]." ".str_replace("'", "", $wpdb->prepare('%s', $params['order'][0]['dir']));
+				if($params['length'] > 0){
+					$sqlRec .= " LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length'])." ";
+				}
 
 				$totalRecords = $wpdb->get_var($sqlTotAll);
 				$recordsFiltered = $wpdb->get_var($sqlTot);

@@ -1,5 +1,20 @@
 <?php
 $api_key = get_option( WP_DISABILITAS_KEY );
+$filter = array();
+if(!empty($_GET)){
+    if(!empty($_GET['gender'])){
+        $filter[] = array('key' => 'gender', 'val' => $_GET['gender']);
+    }
+    if(!empty($_GET['usia'])){
+        $filter[] = array('key' => 'tanggal_lahir', 'val' => $_GET['usia']);
+    }
+    if(!empty($_GET['jenis_disabilitas'])){
+        $filter[] = array('key' => 'jenis_disabilitas', 'val' => $_GET['jenis_disabilitas']);
+    }
+    if(!empty($_GET['desa'])){
+        $filter[] = array('key' => 'desa', 'val' => $_GET['desa']);
+    }
+}
 ?>
 <h1 class="text-center">Data Disabilitas</h1>
 <div style="padding: 10px; margin: auto; overflow: auto;" id="pesan">
@@ -98,6 +113,7 @@ $api_key = get_option( WP_DISABILITAS_KEY );
 </div>
 <script type="text/javascript" src="<?php echo WP_DISABILITAS_PLUGIN_URL; ?>/public/js/datatables.min.js"></script>
 <script type="text/javascript">
+window.filter = <?php echo json_encode($filter); ?>;
 jQuery('document').ready(function(){
     var oTable = jQuery('#data-table').dataTable({
         serverSide: true,
@@ -105,6 +121,7 @@ jQuery('document').ready(function(){
         ajax: function (data, callback, settings) {
             jQuery('#wrap-loading').show();
             data.action = 'get_data_disabilitas_all';
+            data.filter = filter;
             data.api_key = '<?php echo $api_key; ?>';
             jQuery.ajax({
                 url: ajax.url,

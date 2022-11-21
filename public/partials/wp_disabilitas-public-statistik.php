@@ -1,5 +1,30 @@
 <?php
 global $wpdb;
+
+$login = false;
+if(is_user_logged_in()){
+    $current_user = wp_get_current_user();
+    if($this->functions->user_has_role($current_user->ID, 'administrator')){
+        $login = true;
+    }
+}
+
+if(true == $login){
+    $data_disabilitas_admin = $this->functions->generatePage(array(
+        'nama_page' => 'Data Disabilitas Admin', 
+        'content' => '[data_disabilitas_admin]',
+        'show_header' => 1,
+        'no_key' => 1,
+    ));
+    $link_data_admin = $data_disabilitas_admin['url'];
+}else{
+    $link_data_admin = '';
+}
+
+function link_detail($link_admin, $jenis){
+    return "<a target='_blank' href='".$link_admin."?".$jenis['key']."=".$jenis['value']."'>".$jenis['label']."</a>";
+}
+
 function generateRandomColor($k){
     $color = array('#f44336', '#9c27b0', '#2196f3', '#009688', '#4caf50', '#cddc39', '#ff9800', '#795548', '#9e9e9e', '#607d8b');
     return $color[$k%10];
@@ -75,6 +100,9 @@ foreach($gender as $k => $v){
     $chart_gender['label'][] = $jenis;
     $chart_gender['data'][] = $jumlah;
     $chart_gender['color'][] = $color;
+    if(true == $login){
+        $jenis = link_detail($link_data_admin, array('key' => 'gender', 'value' => $k, 'label' => $jenis ));
+    }
     $body_gender .= "
         <tr>
             <td>$jenis</td>
@@ -147,6 +175,9 @@ foreach($jenis_disabilitas as $k => $v){
     $chart_jenis['label'][] = $jenis;
     $chart_jenis['data'][] = $jumlah;
     $chart_jenis['color'][] = generateRandomColor($no);
+    if(true == $login){
+        $jenis = link_detail($link_data_admin, array('key' => 'jenis_disabilitas', 'value' => $jenis, 'label' => $jenis ));
+    }
     $body_jenis .= "
         <tr>
             <td>$jenis</td>
@@ -168,16 +199,19 @@ foreach($desa as $k => $v){
     $no++;
     $jumlah = count($v);
     $total_desa += $jumlah;
-    $desa = $k;
-    if(empty($desa)){
-        $desa = 'Tidak diketahui';
+    $nama_desa = $k;
+    if(empty($nama_desa)){
+        $nama_desa = 'Tidak diketahui';
     }
-    $chart_desa['label'][] = $desa;
+    $chart_desa['label'][] = $nama_desa;
     $chart_desa['data'][] = $jumlah;
     $chart_desa['color'][] = generateRandomColor($no);
+    if(true == $login){
+        $nama_desa = link_detail($link_data_admin, array('key' => 'desa', 'value' => $nama_desa, 'label' => $nama_desa ));
+    }
     $body_desa .= "
         <tr>
-            <td>$desa</td>
+            <td>$nama_desa</td>
             <td class='text-right'>$jumlah</td>
         </tr>
     ";
