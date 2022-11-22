@@ -359,7 +359,35 @@ class Wp_disabilitas_Public {
 
 				if(!empty($params['filter'])){
 					foreach($params['filter'] as $v){
-						$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).'='.$wpdb->prepare('%s', $v['val']);
+						if($v['key'] == 'tanggal_lahir'){
+							if($v['val'] == 1){
+								$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).' is NULL';
+							}else if($v['val'] == 5){
+								$timestamp = strtotime('-51 years');
+								$start = date('Y-m-d', $timestamp);
+								$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).' <= '.$wpdb->prepare('%s', $start);
+							}else{
+								$start = '';
+								$end = date('Y-m-d');
+								if($v['val'] == 2){ // 0 - 5 tahun
+									$timestamp = strtotime('-6 years 1 days');
+									$start = date('Y-m-d', $timestamp);
+								}else if($v['val'] == 3){ // 6 - 17 tahun
+									$timestamp = strtotime('-6 years');
+									$end = date('Y-m-d', $timestamp);
+									$timestamp = strtotime('-18 years 1 days');
+									$start = date('Y-m-d', $timestamp);
+								}else if($v['val'] == 4){ // 18 - 50 tahun
+									$timestamp = strtotime('-18 years');
+									$end = date('Y-m-d', $timestamp);
+									$timestamp = strtotime('-51 years 1 days');
+									$start = date('Y-m-d', $timestamp);
+								}
+								$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).' BETWEEN '.$wpdb->prepare('%s', $start).' AND '.$wpdb->prepare('%s', $end);
+							}
+						}else{	
+							$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).'='.$wpdb->prepare('%s', $v['val']);
+						}
 					}
 				}
 
@@ -409,5 +437,18 @@ class Wp_disabilitas_Public {
 			get_option('_crb_disabilitas_kec')
 		);
 		return implode('<br>', $judul);
+	}
+
+	function hitung_umur($tanggal_lahir){
+	    if(empty($tanggal_lahir)){
+	        return "Tidak diketahui";
+	    }
+	    $birthDate = new DateTime($tanggal_lahir);
+	    $today = new DateTime("today");
+	    if ($birthDate > $today) { 
+	        return "0";
+	    }
+	    $y = $today->diff($birthDate)->y;
+	    return $y."";
 	}
 }

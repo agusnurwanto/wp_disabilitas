@@ -29,18 +29,6 @@ function generateRandomColor($k){
     $color = array('#f44336', '#9c27b0', '#2196f3', '#009688', '#4caf50', '#cddc39', '#ff9800', '#795548', '#9e9e9e', '#607d8b');
     return $color[$k%10];
 }
-function hitung_umur($tanggal_lahir){
-    if(empty($tanggal_lahir)){
-        return "Tidak diketahui";
-    }
-    $birthDate = new DateTime($tanggal_lahir);
-    $today = new DateTime("today");
-    if ($birthDate > $today) { 
-        return "0";
-    }
-    $y = $today->diff($birthDate)->y;
-    return $y."";
-}
 $data = $wpdb->get_results("select * from data_disabilitas", ARRAY_A);
 $total_data = count($data);
 $gender = array();
@@ -53,7 +41,7 @@ foreach($data as $k => $v){
     }
     $gender[$v['gender']][] = $v;
 
-    $current_usia = hitung_umur($v['tanggal_lahir']);
+    $current_usia = $this->hitung_umur($v['tanggal_lahir']);
     if(empty($usia[$current_usia])){
         $usia[$current_usia] = array();
     }
@@ -147,6 +135,22 @@ foreach($usia_baru as $k => $v){
     $chart_usia['label'][] = $jenis;
     $chart_usia['data'][] = $jumlah;
     $chart_usia['color'][] = generateRandomColor($no);
+
+    if(true == $login){
+        $jenis_usia = false;
+        if($k == 'Tidak diketahui'){
+            $jenis_usia = 1;
+        }else if($k == '0 - 5 tahun'){
+            $jenis_usia = 2;
+        }else if($k == '6 - 17 tahun'){
+            $jenis_usia = 3;
+        }else if($k == '18 - 50 tahun'){
+            $jenis_usia = 4;
+        }else{
+            $jenis_usia = 5;
+        }
+        $jenis = link_detail($link_data_admin, array('key' => 'usia', 'value' => $jenis_usia, 'label' => $jenis ));
+    }
     $body_usia .= "
         <tr>
             <td>$jenis</td>
