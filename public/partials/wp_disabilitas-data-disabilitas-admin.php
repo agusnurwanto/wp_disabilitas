@@ -1,23 +1,47 @@
 <?php
 $api_key = get_option( WP_DISABILITAS_KEY );
 $filter = array();
+$judul_filter = '';
 if(!empty($_GET)){
     if(!empty($_GET['gender'])){
         $filter[] = array('key' => 'gender', 'val' => $_GET['gender']);
+        $gender = 'Tidak Diketahui';
+        if($_GET['gender'] == 'P'){
+            $gender = 'Perempuan';
+        }else if($_GET['gender'] == 'L'){
+            $gender = 'Laki-Laki';
+        }
+        $judul_filter .= '<h2 class="text-center">Dengan Pengelompokan Jenis Kelamin '.$gender.'</h2>';
     }
     if(!empty($_GET['usia'])){
         $filter[] = array('key' => 'tanggal_lahir', 'val' => $_GET['usia']);
+        $usia = 'Tidak Diketahui';
+        if($_GET['usia'] == 1){
+            $usia = 'Tidak Diketahui';
+        }else if($_GET['usia'] == 2){
+            $usia = '0 - 5 Tahun';
+        }else if($_GET['usia'] == 3){
+            $usia = '6 - 17 Tahun';
+        }else if($_GET['usia'] == 4){
+            $usia = '18 - 50 Tahun';
+        }else if($_GET['usia'] == 5){
+            $usia = '51 - Lansia';
+        }
+        $judul_filter .= '<h2 class="text-center">Dengan Pengelompokan Usia '.$usia.'</h2>';
     }
     if(!empty($_GET['jenis_disabilitas'])){
         $filter[] = array('key' => 'jenis_disabilitas', 'val' => $_GET['jenis_disabilitas']);
+        $judul_filter .= '<h2 class="text-center">Dengan Pengelompokan Jenis Disabilitas '.$_GET['jenis_disabilitas'].'</h2>';
     }
     if(!empty($_GET['desa'])){
         $filter[] = array('key' => 'desa', 'val' => $_GET['desa']);
+        $judul_filter .= '<h2 class="text-center">Dengan Pengelompokan Desa '.$_GET['desa'].'</h2>';
     }
 }
 ?>
 <h1 class="text-center">Data Disabilitas</h1>
 <h2 class="text-center"><?php echo $this->get_judul(); ?></h2>
+<?php echo $judul_filter; ?>
 <div style="padding: 10px; margin: auto; overflow: auto;" id="pesan">
     <table class="table table-bordered" id="data-table">
         <thead>
