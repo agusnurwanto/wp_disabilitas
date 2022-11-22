@@ -17,6 +17,7 @@ if(!empty($_GET)){
 }
 ?>
 <h1 class="text-center">Data Disabilitas</h1>
+<h2 class="text-center"><?php echo $this->get_judul(); ?></h2>
 <div style="padding: 10px; margin: auto; overflow: auto;" id="pesan">
     <table class="table table-bordered" id="data-table">
         <thead>

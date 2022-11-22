@@ -402,4 +402,12 @@ class Wp_disabilitas_Public {
 		die(json_encode($ret));
 	}
 
+	function get_judul(){
+		$judul = array(
+			get_option('_crb_disabilitas_prop'),
+			get_option('_crb_disabilitas_kab'),
+			get_option('_crb_disabilitas_kec')
+		);
+		return implode('<br>', $judul);
+	}
 }

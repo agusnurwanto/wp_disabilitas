@@ -9,6 +9,7 @@ if(is_user_logged_in()){
 }
 ?>
 <h1 class="text-center">Cek Data Disabilitas</h1>
+<h2 class="text-center"><?php echo $this->get_judul(); ?></h2>
 <form id="formid" style="width: 500px; margin: auto;" class="text-center">
     <div class="form-group">
         <div class="g-recaptcha" data-sitekey="<?php echo get_option('_crb_disabilitas_captcha_public'); ?>" style="margin: 10px auto; width: 300px;"></div>

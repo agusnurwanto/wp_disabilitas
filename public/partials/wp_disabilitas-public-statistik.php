@@ -227,6 +227,7 @@ foreach($desa as $k => $v){
         <div class="row">
             <div class="col-md-12">
                 <h1 class="text-center">Data Statistik Disabilitas</h1>
+                <h2 class="text-center"><?php echo $this->get_judul(); ?></h2>
                 <h2 class="text-center">Total Disabilitas = <?php echo $total_data; ?> Orang</h2>
             </div>
         </div>
