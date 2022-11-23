@@ -385,8 +385,12 @@ class Wp_disabilitas_Public {
 								}
 								$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).' BETWEEN '.$wpdb->prepare('%s', $start).' AND '.$wpdb->prepare('%s', $end);
 							}
-						}else{	
-							$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).'='.$wpdb->prepare('%s', $v['val']);
+						}else{
+							if($v['val'] == 'Tidak diketahui'){
+								$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).' IS NULL';
+							}else{
+								$where_first .= ' AND '.str_replace("'", "", $wpdb->prepare('%s', $v['key'])).'='.$wpdb->prepare('%s', $v['val']);
+							}
 						}
 					}
 				}

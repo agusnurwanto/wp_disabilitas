@@ -200,6 +200,9 @@ $total_desa = 0;
 $body_desa = "";
 $no = 0;
 foreach($desa as $k => $v){
+    if($k == 'Tidak diketahui'){
+        $jenis = $k;
+    }
     $no++;
     $jumlah = count($v);
     $total_desa += $jumlah;
@@ -215,7 +218,7 @@ foreach($desa as $k => $v){
     }
     $body_desa .= "
         <tr>
-            <td>$nama_desa</td>
+            <td style='text-transform: uppercase;'>$nama_desa</td>
             <td class='text-right'>$jumlah</td>
         </tr>
     ";
